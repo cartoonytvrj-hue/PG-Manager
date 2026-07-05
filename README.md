@@ -50,11 +50,15 @@ Everyone — Super Admin, PG Owner, and Tenant — logs in at the same `/login` 
 
 ## 3. Create your Super Admin account
 
-There's no signup UI for admins by design (security). After deploying:
+There's no signup UI for admins by design (security). Two ways to do this:
 
+**Option A — via SQL Editor (fastest):** Open `supabase/create-user.sql`, edit the email/password/name/role variables near the top, set `new_role := 'super_admin'`, and run the whole file. It creates the login and profile in one step — read the caveat comment at the top of that file first, since it writes directly into Supabase's internal auth tables.
+
+**Option B — via Dashboard (most reliable):**
 1. In Supabase Dashboard → **Authentication → Users** → "Add User" → enter your email + password → confirm email automatically.
 2. Go to **Table Editor → profiles** → find the row with your new user's `id` → change `role` from `pg_owner` to `super_admin`.
-3. Now log in at `/login` with that email — you'll land on `/admin`.
+
+Either way, log in at `/login` with that email — you'll land on `/admin`.
 
 From `/admin` you can create PG Owner accounts (name, email, phone, temp password) — share those credentials with each owner, who logs in at `/login` too. Owners in turn create tenant logins (mobile number + password) via the Tenants or Approvals page — tenants also log in at the same `/login` page, just using their phone number instead of an email.
 
