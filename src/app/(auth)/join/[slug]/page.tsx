@@ -1,10 +1,15 @@
 'use client'
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { Building2, CheckCircle, Loader2 } from 'lucide-react'
 
-export default function JoinPage({ params }: { params: { slug: string } }) {
+// In Next.js 15, route params are now delivered as a Promise (even in client
+// components), so we unwrap it with React's `use()` hook instead of reading
+// `params.slug` directly — the old pattern fails TypeScript's build-time
+// PageProps check with "missing then/catch/finally" errors.
+export default function JoinPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = use(params)
   const [step, setStep] = useState<'form' | 'done'>('form')
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
@@ -75,7 +80,7 @@ export default function JoinPage({ params }: { params: { slug: string } }) {
       // Look up property by qr_slug via a narrow RPC (avoids exposing the
       // full properties row — bank details, UPI ID, etc. — to anonymous visitors)
       const { data: propertyRows, error: propErr } = await sb
-        .rpc('get_property_by_slug', { slug: params.slug })
+        .rpc('get_property_by_slug', { slug })
       const property = propertyRows?.[0]
       if (propErr || !property) { toast.error('Invalid join link. Ask your PG owner for the correct link.'); setSaving(false); return }
 
