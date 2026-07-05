@@ -31,6 +31,19 @@ npm run dev
 
 Visit `http://localhost:3000`.
 
+## Test / sample data (optional but recommended)
+
+The app works fine with zero data — every dashboard shows honest zeros instead of hiding sections. But if you want to see it populated with realistic numbers (rooms, tenants, payments, complaints, expenses) without manually clicking through the UI dozens of times:
+
+1. Sign up / log in as a PG Owner at least once, so your profile row exists (Super Admin can create owner accounts from `/admin`, or sign up directly if you're testing solo).
+2. In Supabase Dashboard → **Table Editor → profiles**, find your row and copy its `id` (a UUID).
+3. Open `supabase/seed-test-data.sql`, replace the placeholder UUID (`00000000-0000-0000-0000-000000000000`) near the top with your real profile `id`.
+4. Paste the whole file into **SQL Editor** and run it.
+
+This creates 2 properties ("Sunrise PG", "Green Valley PG"), 5 rooms, 6 active tenants (including one on notice period and one with a deliberately partial deposit), a pending QR-submitted join request, this month's and last month's rent payments (including a multi-collector partial-payment example — half paid to you, half to a warden — so the Payments ledger has something real to show), a couple of complaints (one open, one resolved), and expenses across two months so the Reports revenue/expense chart has an actual trend instead of flat zeros.
+
+Safe to run only once per owner — re-running it will create duplicate rows (it doesn't check for existing data first), so if you want to reset, delete the rows from Table Editor first.
+
 ## Login (single unified page)
 
 Everyone — Super Admin, PG Owner, and Tenant — logs in at the same `/login` page. There's no role picker: the person enters their **email (owners/admin) or mobile number (tenants)** and password, and the app detects their role automatically after sign-in and routes them to the right dashboard (`/admin`, `/dashboard`, or `/portal`). If someone is already logged in and visits `/login` again, they're bounced straight to their dashboard.
